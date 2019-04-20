@@ -1,0 +1,1 @@
+主要参考了阮一峰[《ECMAScript 6 入门》](https://es6.ruanyifeng.com/)。
