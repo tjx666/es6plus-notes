@@ -39,7 +39,7 @@ Google 公司开源的一个转码器。支持浏览器环境引入 script 脚�
 
 [ES-Checker](https://github.com/ruanyf/es-checker)，用来检查各种运行环境对 ES6 的支持情况。访问 [ruanyf.github.io/es-checker](http://ruanyf.github.io/es-checker)，可以看到您的浏览器支持 ES6 的程度。
 
-### ECMAScript 的提案流程？
+### ECMAScript 的提案的批准流程？
 
 -   Stage 0 - Strawman（展示阶段）
 -   Stage 1 - Proposal（征求意见阶段）
@@ -53,6 +53,10 @@ Google 公司开源的一个转码器。支持浏览器环境引入 script 脚�
 
 参考：[ES7 是正式的称呼吗？](https://www.zhihu.com/question/55753611?utm_source=qq&utm_medium=social&utm_oi=793248355764539392)
 
-个人理解：ES6 狭义指 ECMAScript 2015，广义指 ECMAScript 往后的的标准，即 ECMAScript 2015，ECMAScript 2016，ECMAScript 2017 等往后的都可以、称为 ES6，因为 ES6 有时候被认为是下一代 javascript。
+个人理解：ES6 **狭义**指 ECMAScript 2015。**广义**指 ECMAScript 往后的的标准，即 ECMAScript 2015，ECMAScript 2016，ECMAScript 2017 等往后的都可以称为 ES6，因为 ES6 有时候被认为是下一代 javascript。
 
-ES7 指的是 ECMAScript 2016，so，ECMAScript 2018 就是 ES9 了。
+ES7 指的是 ECMAScript 2016
+
+ES8 指的是 ECMAScript 2017
+
+结论：ES(x+1) 指的是 ECMAScript 201x。
