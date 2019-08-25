@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 /* eslint-disable no-undef */
 /**
  * proxy 是个需要深刻理解和掌握的知识点，许多框架如 vue，mobx 等底层都使用了 proxy 进行数据拦截，依赖收集等
@@ -59,7 +60,7 @@ console.log(me.proxy.name);
 // YuTengjing
 
 // 将代理设置为原型
-const testObj = Object.create(
+let testObj = Object.create(
     new Proxy(
         {},
         {
@@ -133,7 +134,7 @@ SHIRT_SIZES.S; // 10
 // 啥时候 get 拦截器会起作用呢？就是通过 obj.property 或者 obj['property'] 访问的时候
 // get 方法可以被继承吗？
 
-const proxyObj = new Proxy(
+let proxyObj = new Proxy(
     {},
     {
         get: (target, property, receiver) => {
@@ -212,3 +213,99 @@ const dom = new Proxy(
         },
     }
 );
+
+// ------------------------ set -----------------------------
+// 应用场景一：审核被设置的数据
+// 这让我想到 java web 中 java bean 通常都要有 getter, setter, setter 的作用不也是可以对设置的数据做校验，避免直接修改带来不可预知的错误
+const request = new Proxy(
+    {},
+    {
+        set: (target, prop, value, receiver) => {
+            const validMethods = ['GET', 'POST', 'PUT', 'DELETE', 'HEADER', 'OPTION', 'PATCH'];
+            if (!validMethods.includes(value)) {
+                throw new Error(`Method ${value} is invalid! The valid methods is ${JSON.stringify(validMethods)}`);
+            }
+            return true;
+        },
+    }
+);
+// request.method = '喵喵喵';
+
+// 应用场景二：禁止修改
+_EventEmit.DEFAULT_MAX_LISTENERS_COUNT = 10;
+function _EventEmit() {
+    this.listeners = {};
+    this.MAX_LISTENERS_COUNT = EventEmit.DEFAULT_MAX_LISTENERS_COUNT;
+
+    this.addListener = (event, listener) => {
+        if (!this.listeners[event]) this.listeners[event] = [listener];
+        if (this.listeners[event] && this.listeners[event].length > this.MAX_LISTENERS_COUNT)
+            throw new Error(`The listeners for event ${event} had been max(${this.MAX_LISTENERS_COUNT})`);
+        this.listeners[event].push(listener);
+    };
+}
+
+const EventEmit = new Proxy(_EventEmit, {
+    set: (target, prop, value, receiver) => {
+        if (prop === 'DEFAULT_MAX_LISTENERS_COUNT') throw new Error("You can't modify the default max listeners count");
+        target[prop] = value;
+        return true;
+    },
+});
+
+const emit = new EventEmit();
+emit.addListener('click', () => {});
+// EventEmit.DEFAULT_MAX_LISTENERS_COUNT = 99999;
+
+// 应用场景三：响应式
+const Vue = obj => {
+    return new Proxy(obj, {
+        set: (target, prop, value, receiver) => {
+            if (prop in target.data) {
+                console.log('diff...');
+                console.log('re-render...');
+            }
+
+            return true;
+        },
+    });
+};
+
+const vm = Vue({
+    data: {
+        name: 'lyreal666',
+    },
+});
+vm.name = 'ly';
+
+// 什么情况下 receiver 不是指向代理对象本身
+proxyObj = new Proxy(
+    {},
+    {
+        set: (target, prop, value, receiver) => {
+            target[prop] = receiver;
+            return true;
+        },
+    }
+);
+
+testObj = Object.create(proxyObj, {});
+proxyObj.age = 22;
+testObj.age = 18;
+console.log(testObj === testObj.age); // => true
+
+// 严格模式下 set 函数必须返回 true, 否则报错
+const testStrictModelProxySet = () => {
+    'use strict';
+
+    const proxyObj = new Proxy(
+        {},
+        {
+            set: (target, prop, value, receiver) => {
+                target[prop] = value;
+            },
+        }
+    );
+    proxyObj.gf = '???';
+};
+// testStrictModelProxySet(); // TypeError: 'set' on proxy: trap returned falsish for property 'gf'
