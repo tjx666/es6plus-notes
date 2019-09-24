@@ -1,6 +1,6 @@
 ### ECMAScript 和 Javascript 的关系？
 
-ECMAScript 是 Javascript 的规格，个人理解就是规范。Javascript 是 ECMAScript 的一种实现，一种方言？
+ECMAScript 是 Javascript 的规格，个人理解就是规范。Javascript 是 ECMAScript 的一种实现，一种方言。
 
 ### 为什么有没有 ES4?
 
@@ -20,12 +20,6 @@ ECMAScript 是 Javascript 的规格，个人理解就是规范。Javascript 是 
 #### babel
 
 使用 babel 编译器转码，babel 不但提供了将 ES6 转码成 ES5 甚至 ES3 等更低版本的 ECMAScript，还可以通过 babel-polyfill 为当前运行环境提供 ES6 API。
-
-Babel 也可以用于浏览器环境，使用[@babel/standalone](https://babeljs.io/docs/en/next/babel-standalone.html)模块提供的浏览器版本，将其插入网页。注意，网页实时将 ES6 代码转为 ES5，对性能会有影响。生产环境需要加载已经转码完成的脚本。
-
-#### Traceur
-
-Google 公司开源的一个转码器。支持浏览器环境引入 script 脚本转码，也支持作为 node 模块来转码 js 文件。
 
 #### Typescript
 
@@ -59,4 +53,4 @@ ES7 指的是 ECMAScript 2016
 
 ES8 指的是 ECMAScript 2017
 
-结论：ES(x+1) 指的是 ECMAScript 201x。
+结论：ESx 就是 ES201(x-1)

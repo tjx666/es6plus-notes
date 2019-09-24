@@ -1,17 +1,12 @@
-/* eslint-disable quotes */
 /* eslint-disable no-undef */
 /**
- * proxy 是个需要深刻理解和掌握的知识点，许多框架如 vue，mobx 等底层都使用了 proxy 进行数据拦截，依赖收集等
+ * proxy 是个需要深刻理解和掌握的知识点，许多框架如 vue，mobx, immer 等底层都使用了 proxy 实现响应式，观察者模式等
  * vue3 将使用 proxy 代替 Object.define，旨在提高性能和带来更多扩展性
- * 第一次在 js 领域听到元编程这个词就是在阮一峰 ES6 的 proxy 章节，元编程-对编程语言进行编程
+ * proxy 极大的增强了 javascript 的元编程的能力
  */
 
 // ----------------------- 基本使用 -----------------------------
-/**
- * 使用 proxy 时我们需要通过 Proxy 构造器（一般就 new Proxy(target, handler))拿到一个 proxy 对象，
- * 对 proxy 对象的很多 js 的默认操作都会被 handler 定义的拦截器所拦截。借此，我们可以修改 js 语言的很多默认行为
- * 其实很多所谓的响应式，都可以通过 proxy 来实现
- */
+// proxy 的使用方式就是通过 new 构造一个代理对象，也可以在原型上继承一个代理对象来拦截对代理对象的各种操作
 const util = require('util');
 
 const me = {
@@ -21,14 +16,12 @@ const me = {
 };
 
 const meProxy = new Proxy(me, {
-    get: (target, property, proxyObj) => {
-        // console.log(property);
+    get(target, property, receiver) {
         // console.log(`You want to get ${property}`);
-        // eslint-disable-next-line quotes
-        if (property === 'girlFriend') throw new Error("It's a secret!");
+        if (property === 'girlFriend') return "It's a secret!";
         return target[property];
     },
-    set: (target, property, value, proxyObj) => {
+    set(target, property, value, receiver) {
         if (['name, age, girlFriend'].includes(property)) {
             console.log(`You want to set ${property}. but no body can set my information, haha...`);
         } else {
@@ -37,21 +30,22 @@ const meProxy = new Proxy(me, {
     },
 });
 
-// 要想设置的拦截器起作用，我们需要对返回的 proxy 对象操作而不是原对象
+// 要想设置的拦截器起作用，我们需要对返回的 proxy 对象操作而不是原对象，下面直接访问就不会有额外的输出
 console.log(me.name); // => YuTengjing
 console.log(me.girlFriend); // => 😏
 
+// 对代理对象的操作才能被拦截
 console.log(meProxy.name);
-// You want to get name
-// YuTengjing
-// console.log(meProxy.girlFriend);
-// You want to get girlFriend
-// Error: It's a secret!
+/*
+ -> You want to get name
+ -> YuTengjing
+ */
+console.log(meProxy.girlFriend); // => It's a secret!
 
-meProxy.age = 21; // You want to set age. but no body can set my information, haha...
+meProxy.age = 21; // => You want to set age. but no body can set my information, haha...
 console.log(meProxy.age);
-// 22
-// You want to get age
+// => 22
+// => You want to get age
 
 // 将代理对象设置为一个属性
 me.proxy = meProxy;
@@ -91,7 +85,6 @@ console.log(util.types.isProxy(meProxy)); // true
 // proxy 对象可以被代理吗？
 // 可以，下面的 createEnum 函数就是将 proxy 对象作为 target 构造一个新的 proxy 对象
 const NOPE = () => {
-    // eslint-disable-next-line quotes
     throw new Error("Can't modify read-only view");
 };
 
@@ -215,7 +208,7 @@ const dom = new Proxy(
 );
 
 // ------------------------ set -----------------------------
-// 应用场景一：审核被设置的数据
+// 应用场景一：校验被设置的数据
 // 这让我想到 java web 中 java bean 通常都要有 getter, setter, setter 的作用不也是可以对设置的数据做校验，避免直接修改带来不可预知的错误
 const request = new Proxy(
     {},
@@ -301,7 +294,7 @@ const testStrictModelProxySet = () => {
     const proxyObj = new Proxy(
         {},
         {
-            set: (target, prop, value, receiver) => {
+            set(target, prop, value, receiver) {
                 target[prop] = value;
             },
         }
