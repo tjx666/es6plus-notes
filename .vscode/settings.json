@@ -1,0 +1,5 @@
+{
+    "code-runner.executorMapByGlob": {
+        "*.es6.js": "npx babel notes -d dist && node $workspaceRoot/dist/Decorators/$fileName",
+    }
+}
